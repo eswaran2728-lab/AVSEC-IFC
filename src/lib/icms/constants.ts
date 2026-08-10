@@ -1,0 +1,146 @@
+import type {
+  CargoType,
+  DeliveryLocation,
+  Direction,
+  IncidentStatus,
+  IncidentType,
+  Role,
+  SealColor,
+  SealType,
+  TransactionStatus,
+} from "./database.types";
+
+export const ROLE_LABELS: Record<Role, string> = {
+  // Covers both the in-flight catering warehouse and the SRA warehouse —
+  // the direction is chosen per transaction, not implied by the role.
+  warehouse_pic: "Warehouse PIC",
+  post2_avsec: "AVSEC In-flight Post (Post 2)",
+  post6_avsec: "AVSEC Airport Post (Post 6)",
+  receiver: "SRA / Aircraft Receiver",
+  // Internal DB role value stays 'supervisor' (RLS, policies, seed data all
+  // key off it) — only the user-facing label changes to "Admin".
+  supervisor: "Admin",
+};
+
+export const STATUS_LABELS: Record<TransactionStatus, string> = {
+  CREATED: "Created — awaiting checkpoint",
+  INFLIGHT_POST_APPROVED: "In-flight Post approved",
+  AIRPORT_POST_APPROVED: "Airport Post approved",
+  COMPLETED: "Completed",
+  ESCALATED: "Escalated",
+};
+
+export const STATUS_COLORS: Record<TransactionStatus, string> = {
+  CREATED: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200",
+  INFLIGHT_POST_APPROVED: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+  AIRPORT_POST_APPROVED: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200",
+  COMPLETED: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
+  // Amber/orange, not red, so escalated status stays visually distinct
+  // from the app's red primary brand color.
+  ESCALATED: "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200",
+};
+
+export const DIRECTION_LABELS: Record<Direction, string> = {
+  OUTBOUND: "Outbound — Departure",
+  INBOUND: "Inbound — Arrival",
+};
+
+/** Matches the physical truck seal colors: blue outbound, green inbound. */
+export const DIRECTION_COLORS: Record<Direction, string> = {
+  OUTBOUND: "bg-blue-600 text-white dark:bg-blue-500",
+  INBOUND: "bg-green-600 text-white dark:bg-green-500",
+};
+
+export const DELIVERY_LOCATION_LABELS: Record<DeliveryLocation, string> = {
+  SRA_WAREHOUSE: "SRA Warehouse",
+  AIRCRAFT: "Aircraft",
+};
+
+/** IFCSF (AA/SEC/F/010 Rev.01) cargo-type checklist, Part A header. */
+export const CARGO_TYPE_LABELS: Record<CargoType, string> = {
+  FOOD_BEVERAGE: "Food & Beverage",
+  PERISHABLE: "Perishable",
+  DUTY_FREE: "Duty Free",
+  MERCHANDISE: "Merchandise",
+  VEHICLE_MAINTENANCE: "Vehicle Maintenance",
+};
+
+export const CARGO_TYPES: CargoType[] = [
+  "FOOD_BEVERAGE",
+  "PERISHABLE",
+  "DUTY_FREE",
+  "MERCHANDISE",
+  "VEHICLE_MAINTENANCE",
+];
+
+export const INCIDENT_TYPE_LABELS: Record<IncidentType, string> = {
+  BROKEN_SEAL: "Broken Seal",
+  SEAL_MISMATCH: "Seal Mismatch",
+  UNAUTHORIZED_DRIVER: "Unauthorized Driver",
+  UNAUTHORIZED_VEHICLE: "Unauthorized Vehicle",
+  EXPIRED_PASS: "Expired Airport Pass",
+  WRONG_SEAL_COLOR: "Wrong Seal Color",
+  TIMEOUT: "Transaction Timeout",
+  OTHER: "Other",
+  WHITELIST_VIOLATION: "Whitelist Violation",
+  SEGMENT_TIMEOUT: "Segment Timeout",
+};
+
+export const INCIDENT_STATUS_LABELS: Record<IncidentStatus, string> = {
+  OPEN: "Open",
+  UNDER_REVIEW: "Under Review",
+  RESOLVED: "Resolved",
+  CLOSED: "Closed",
+};
+
+/** Full 4-stage lifecycle for every incident type except SEGMENT_TIMEOUT. */
+export const INCIDENT_LIFECYCLE: IncidentStatus[] = ["OPEN", "UNDER_REVIEW", "RESOLVED", "CLOSED"];
+/** Lighter lifecycle for SEGMENT_TIMEOUT (low-severity traffic-delay noise):
+ *  OPEN -> RESOLVED in one step, no forced UNDER_REVIEW/CLOSED. */
+export const INCIDENT_LIFECYCLE_LIGHT: IncidentStatus[] = ["OPEN", "RESOLVED"];
+
+/** Which lifecycle stages an incident may move through, keyed off its type. */
+export function lifecycleFor(incidentType: IncidentType): IncidentStatus[] {
+  return incidentType === "SEGMENT_TIMEOUT" ? INCIDENT_LIFECYCLE_LIGHT : INCIDENT_LIFECYCLE;
+}
+
+export const INCIDENT_STATUS_COLORS: Record<IncidentStatus, string> = {
+  OPEN: "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200",
+  UNDER_REVIEW: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+  RESOLVED: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
+  CLOSED: "bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
+};
+
+export const SEAL_TYPE_LABELS: Record<SealType, string> = {
+  TRUCK_SEAL: "Truck Seal",
+  TROLLEY: "Trolley Seal",
+  OTHER: "Other",
+};
+
+export const SEAL_COLOR_LABELS: Record<SealColor, string> = {
+  BLUE: "Blue",
+  GREEN: "Green",
+  OTHER: "Other",
+};
+
+export const SEAL_COLOR_BADGES: Record<SealColor, string> = {
+  BLUE: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200",
+  GREEN: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200",
+  OTHER: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
+};
+
+/**
+ * Checkpoint seal-colour picker options. Seal colour is a manual choice at
+ * every checkpoint (Part A and every verification screen) — the officer
+ * picks Blue or Green every time; nothing is pre-selected or inferred from
+ * direction.
+ */
+export const CHECKPOINT_SEAL_COLORS: Extract<SealColor, "BLUE" | "GREEN">[] = ["BLUE", "GREEN"];
+
+export const ALL_ROLES: Role[] = [
+  "warehouse_pic",
+  "post2_avsec",
+  "post6_avsec",
+  "receiver",
+  "supervisor",
+];

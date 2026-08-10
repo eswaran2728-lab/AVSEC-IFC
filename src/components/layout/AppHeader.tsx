@@ -72,6 +72,9 @@ export function AppHeader({
               Users
             </Link>
           )}
+          <Link href="/icms" className="btn-quiet">
+            Catering (ICMS)
+          </Link>
           <form action={signOut}>
             <button type="submit" className="btn-quiet">
               Sign out

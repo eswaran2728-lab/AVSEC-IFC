@@ -35,9 +35,26 @@ export const viewport: Viewport = {
   ],
 };
 
+// Dark mode init: defaults to the system preference (matching AVSEC's
+// previous darkMode:"media" behavior) unless the ICMS module's manual
+// light/dark toggle (src/components/icms/theme-toggle.tsx) has stored an
+// explicit choice. Runs before paint to avoid a flash of the wrong theme.
+const themeInit = `
+try {
+  const stored = localStorage.getItem("cscs-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (stored === "dark" || (!stored && prefersDark)) {
+    document.documentElement.classList.add("dark");
+  }
+} catch (e) {}
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
       <body className="min-h-screen antialiased">
         <OfflineSyncProvider>
           <ServiceWorkerRegister />

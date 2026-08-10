@@ -1,15 +1,22 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  // "media": there's no manual light/dark toggle anywhere in the app, so dark mode
-  // should just follow the device's system setting — matches what globals.css assumed.
-  darkMode: "media",
+  // Switched from "media" to "class": AVSEC's own dark mode still follows the
+  // system preference by default (see the theme-init script in the root
+  // layout, which falls back to prefers-color-scheme when nothing is stored)
+  // — but this also lets the ICMS module's manual light/dark toggle work.
+  darkMode: "class",
   content: [
     "./src/app/**/*.{ts,tsx}",
     "./src/components/**/*.{ts,tsx}",
+    "./src/lib/**/*.{ts,tsx}",
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-body)", "system-ui", "sans-serif"],
+        heading: ["var(--font-heading)", "var(--font-body)", "system-ui", "sans-serif"],
+      },
       colors: {
         // AirAsia red — matches the AirAsia / AVSEC AirAsia badge logos.
         brand: {
@@ -43,6 +50,43 @@ const config: Config = {
           400: "#fbbf24",
           500: "#f59e0b",
           600: "#d97706",
+        },
+        // ICMS module tokens (shadcn-style, hsl(var(--x)) — see globals.css).
+        // Named "icms-*"/generic-additive only: "brand" above already means
+        // AVSEC's red shade scale, so the ICMS module's own equivalent single
+        // accent color is namespaced as icms-brand to avoid colliding with it.
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        "icms-brand": {
+          DEFAULT: "hsl(var(--icms-brand))",
+          foreground: "hsl(var(--icms-brand-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
       },
       fontSize: {

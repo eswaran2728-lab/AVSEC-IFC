@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
@@ -11,28 +11,58 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value;
+        getAll() {
+          return request.cookies.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
-          request.cookies.set({ name, value, ...options });
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request: { headers: request.headers } });
-          response.cookies.set({ name, value, ...options });
-        },
-        remove(name: string, options: CookieOptions) {
-          request.cookies.set({ name, value: "", ...options });
-          response = NextResponse.next({ request: { headers: request.headers } });
-          response.cookies.set({ name, value: "", ...options });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
         },
       },
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const {
+      data: { user: fetchedUser },
+    } = await supabase.auth.getUser();
+    user = fetchedUser;
+  } catch {
+    // Stale/invalid refresh token cookie: treat as signed out instead of
+    // crashing the edge middleware on every request.
+    user = null;
+  }
 
   const path = request.nextUrl.pathname;
+
+  // ICMS module (catering security checkpoints) lives entirely under /icms —
+  // it has its own login/register pages and its own profile table, gated
+  // independently from AVSEC Reports below.
+  if (path.startsWith("/icms")) {
+    const isIcmsPublic = path.startsWith("/icms/login") || path.startsWith("/icms/register");
+    if (!user && !isIcmsPublic) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/icms/login";
+      url.searchParams.set("next", path);
+      const redirectResponse = NextResponse.redirect(url);
+      request.cookies.getAll().forEach(({ name }) => {
+        if (name.startsWith("sb-")) redirectResponse.cookies.delete(name);
+      });
+      return redirectResponse;
+    }
+    if (user && path === "/icms/login") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/icms";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+    return response;
+  }
+
   const isPublic =
     path.startsWith("/login") ||
     path.startsWith("/auth") ||
