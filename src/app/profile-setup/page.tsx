@@ -6,11 +6,12 @@ import { STATIONS, TEAMS, REQUESTABLE_ROLES, ROLE_LABELS } from "@/lib/reference
 export default async function ProfileSetupPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   const profile = await getCurrentProfile();
+  const params = await searchParams;
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4">
@@ -21,9 +22,9 @@ export default async function ProfileSetupPage({
           Your role request needs Admin approval before you can access the app.
         </p>
 
-        {searchParams.error && (
+        {params.error && (
           <p className="field-error mb-4">
-            {searchParams.error === "missing" ? "All fields are required." : searchParams.error}
+            {params.error === "missing" ? "All fields are required." : params.error}
           </p>
         )}
 

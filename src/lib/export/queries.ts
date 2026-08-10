@@ -11,7 +11,7 @@ function rangeToTimestamps(filters: DashboardFilters) {
 export async function getFullRowsForExport(
   filters: DashboardFilters,
 ): Promise<Record<ReportType, Record<string, unknown>[]>> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { from, to } = rangeToTimestamps(filters);
   const types: ReportType[] = filters.reportType ? [filters.reportType] : [...REPORT_TYPES];
 

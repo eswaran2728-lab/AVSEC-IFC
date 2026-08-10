@@ -8,10 +8,10 @@ import { formatDateTimeMY } from "@/lib/datetime";
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: { reg?: string };
+  searchParams: Promise<{ reg?: string }>;
 }) {
   const profile = await requireRole(ENFORCEMENT_ROLES);
-  const reg = (searchParams.reg || "").trim();
+  const reg = ((await searchParams).reg || "").trim();
   const results = reg ? await searchByAircraftReg(reg) : [];
 
   return (

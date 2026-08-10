@@ -15,7 +15,7 @@ export interface AircraftSearchResult {
 // Aircraft registration number appears under a different column on each report type;
 // SEC 014 has no aircraft field, so it's excluded. Only submitted reports are searched.
 export async function searchByAircraftReg(regNo: string): Promise<AircraftSearchResult[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const pattern = `%${regNo.trim()}%`;
 
   const [sec016, sec029, sec018Patrols] = await Promise.all([
@@ -113,7 +113,7 @@ export async function searchDailyReportsByStaff(
   staffName: string,
   date: string,
 ): Promise<StaffReportResult[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { from, to } = dayRangeMY(date);
 
   const { data } = await supabase
@@ -143,7 +143,7 @@ export async function searchAircraftReportsByStaff(
   staffName: string,
   date: string,
 ): Promise<StaffReportResult[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { from, to } = dayRangeMY(date);
   const pattern = `%${staffName.trim()}%`;
 

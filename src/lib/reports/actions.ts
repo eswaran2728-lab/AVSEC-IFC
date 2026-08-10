@@ -36,7 +36,7 @@ export async function submitSec016(input: unknown): Promise<ActionResult> {
   }
   const v = parsed.data;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("report_sec016")
     .insert({
@@ -109,7 +109,7 @@ export async function submitSec014(input: unknown): Promise<ActionResult> {
   }
   const v = parsed.data;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: report, error } = await supabase
     .from("report_sec014")
     .insert({
@@ -166,7 +166,7 @@ export async function submitSec029(input: unknown): Promise<ActionResult> {
   }
   const v = parsed.data;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: report, error } = await supabase
     .from("report_sec029")
     .insert({
@@ -240,7 +240,7 @@ export async function submitSec018(input: unknown): Promise<ActionResult> {
   }
   const v = parsed.data;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: report, error } = await supabase
     .from("report_sec018")
     .insert({
@@ -296,7 +296,7 @@ export async function addBayBoardEntry(input: {
   const profile = await requireProfileId();
   if (!profile) return { ok: false, error: "Not authenticated" };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("bay_board")
     .insert({

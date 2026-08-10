@@ -10,14 +10,15 @@ import type { Sec016Row, Sec014Row, Sec029Row, Sec018Row } from "@/lib/types";
 export default async function ReportViewPage({
   params,
 }: {
-  params: { type: string; id: string };
+  params: Promise<{ type: string; id: string }>;
 }) {
   const profile = await requireProfile();
+  const { type: typeParam, id } = await params;
 
-  if (!REPORT_TYPES.includes(params.type as ReportType)) notFound();
-  const type = params.type as ReportType;
+  if (!REPORT_TYPES.includes(typeParam as ReportType)) notFound();
+  const type = typeParam as ReportType;
 
-  const report = await getReportById(type, params.id);
+  const report = await getReportById(type, id);
   if (!report) notFound();
 
   const meta = REPORT_META[type];
@@ -33,7 +34,7 @@ export default async function ReportViewPage({
           </p>
         </div>
 
-        <a href={`/api/export/pdf/${type}/${params.id}`} className="btn-secondary w-full" target="_blank">
+        <a href={`/api/export/pdf/${type}/${id}`} className="btn-secondary w-full" target="_blank">
           Download PDF (audit submission)
         </a>
 

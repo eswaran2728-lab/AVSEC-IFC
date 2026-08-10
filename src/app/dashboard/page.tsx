@@ -19,17 +19,18 @@ import { searchDailyReportsByStaff, searchAircraftReportsByStaff } from "@/lib/s
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Record<string, string | undefined>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const profile = await requireRole(MONITOR_ROLES);
+  const params = await searchParams;
 
   const today = todayISODateMY();
   const filters: DashboardFilters = {
-    dateFrom: searchParams.dateFrom || today,
-    dateTo: searchParams.dateTo || today,
-    station: searchParams.station || undefined,
-    team: searchParams.team || undefined,
-    reportType: (searchParams.reportType as ReportType) || undefined,
+    dateFrom: params.dateFrom || today,
+    dateTo: params.dateTo || today,
+    station: params.station || undefined,
+    team: params.team || undefined,
+    reportType: (params.reportType as ReportType) || undefined,
   };
 
   const [{ counts, submissions }, bayBoard, discrepancyCount] = await Promise.all([
@@ -53,9 +54,9 @@ export default async function DashboardPage({
     discrepancyCount,
   );
 
-  const staffQuery = (searchParams.staffQuery || "").trim();
-  const staffDate = searchParams.staffDate || today;
-  const staffCategory = searchParams.staffCategory === "aircraft" ? "aircraft" : "daily";
+  const staffQuery = (params.staffQuery || "").trim();
+  const staffDate = params.staffDate || today;
+  const staffCategory = params.staffCategory === "aircraft" ? "aircraft" : "daily";
   const staffResults = staffQuery
     ? await (staffCategory === "aircraft"
         ? searchAircraftReportsByStaff(staffQuery, staffDate)

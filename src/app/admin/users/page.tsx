@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export default async function AdminUsersPage() {
   const profile = await requireRole(ADMIN_ROLES);
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
   const profiles = (data as Profile[]) ?? [];
 

@@ -22,7 +22,7 @@ export async function updateProfile(formData: FormData) {
     redirect("/profile-setup?error=Invalid role");
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase
     .from("profiles")
     .update({ name, staff_no, station, team, role })
@@ -36,7 +36,7 @@ export async function updateProfile(formData: FormData) {
 }
 
 export async function signOut() {
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
 }

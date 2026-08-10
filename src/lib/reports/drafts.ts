@@ -8,7 +8,7 @@ export async function saveDraft(reportType: ReportType, data: unknown): Promise<
   const profile = await getCurrentProfile();
   if (!profile) return { ok: false, error: "Not authenticated" };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase
     .from("report_drafts")
     .upsert(
@@ -24,7 +24,7 @@ export async function loadDraft(reportType: ReportType): Promise<unknown | null>
   const profile = await getCurrentProfile();
   if (!profile) return null;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data } = await supabase
     .from("report_drafts")
     .select("data")
@@ -39,7 +39,7 @@ export async function clearDraft(reportType: ReportType): Promise<void> {
   const profile = await getCurrentProfile();
   if (!profile) return;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase
     .from("report_drafts")
     .delete()

@@ -35,7 +35,7 @@ export interface FilteredSubmission {
 }
 
 export async function getFilteredSubmissions(filters: DashboardFilters): Promise<FilteredSubmission[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { from, to } = rangeToTimestamps(filters);
   const types: ReportType[] = filters.reportType ? [filters.reportType] : [...REPORT_TYPES];
 
@@ -95,7 +95,7 @@ export async function getTodayCounts(filters: DashboardFilters) {
 }
 
 export async function getStationOfficers(station: string): Promise<Profile[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data } = await supabase
     .from("profiles")
     .select("*")
@@ -129,7 +129,7 @@ export async function getShiftCompliance(
 }
 
 export async function getFlightCoverage(filters: DashboardFilters) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { from, to } = rangeToTimestamps(filters);
   let query = supabase
     .from("report_sec016")
@@ -144,7 +144,7 @@ export async function getFlightCoverage(filters: DashboardFilters) {
 }
 
 export async function getDiscrepancyCount(filters: DashboardFilters): Promise<number> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { from, to } = rangeToTimestamps(filters);
 
   let sec016Query = supabase

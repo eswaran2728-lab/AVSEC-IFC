@@ -9,7 +9,7 @@ export async function approveUser(formData: FormData) {
   const profileId = String(formData.get("profileId") || "");
   if (!profileId) return;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.from("profiles").update({ status: "approved" }).eq("id", profileId);
   revalidatePath("/admin/users");
 }
@@ -19,7 +19,7 @@ export async function rejectUser(formData: FormData) {
   const profileId = String(formData.get("profileId") || "");
   if (!profileId) return;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.from("profiles").update({ status: "rejected" }).eq("id", profileId);
   revalidatePath("/admin/users");
 }

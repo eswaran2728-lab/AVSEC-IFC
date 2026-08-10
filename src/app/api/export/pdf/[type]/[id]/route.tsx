@@ -11,16 +11,17 @@ import type { Sec016Row, Sec014Row, Sec029Row, Sec018Row } from "@/lib/types";
 
 export async function GET(
   _request: Request,
-  { params }: { params: { type: string; id: string } },
+  { params }: { params: Promise<{ type: string; id: string }> },
 ) {
   await requireProfile();
+  const { type: typeParam, id } = await params;
 
-  if (!REPORT_TYPES.includes(params.type as ReportType)) {
+  if (!REPORT_TYPES.includes(typeParam as ReportType)) {
     return NextResponse.json({ error: "Unknown report type" }, { status: 404 });
   }
-  const type = params.type as ReportType;
+  const type = typeParam as ReportType;
 
-  const report = await getReportById(type, params.id);
+  const report = await getReportById(type, id);
   if (!report) {
     return NextResponse.json({ error: "Report not found" }, { status: 404 });
   }
@@ -44,7 +45,7 @@ export async function GET(
   return new NextResponse(new Uint8Array(buffer), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${type}-${params.id}.pdf"`,
+      "Content-Disposition": `attachment; filename="${type}-${id}.pdf"`,
     },
   });
 }

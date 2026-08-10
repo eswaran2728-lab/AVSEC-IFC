@@ -8,7 +8,7 @@ const FOUR_HOURS = 4;
 export async function getOverdueAircraft(station: string): Promise<
   (BayBoardRow & { hoursOnGround: number })[]
 > {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data } = await supabase
     .from("bay_board")
     .select("*")
@@ -25,7 +25,7 @@ export async function getOverdueAircraft(station: string): Promise<
 export async function getOpenBayBoard(station?: string): Promise<
   (BayBoardRow & { hoursOnGround: number })[]
 > {
-  const supabase = createClient();
+  const supabase = await createClient();
   let query = supabase.from("bay_board").select("*").is("cleared_at", null);
   if (station) query = query.eq("station", station);
   const { data } = await query.order("on_ground_since", { ascending: true });
@@ -42,7 +42,7 @@ export async function getMySubmissions({
   profileId,
   limit = 20,
 }: MySubmissionsOptions): Promise<ReportListItem[]> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const types: ReportType[] = ["sec016", "sec014", "sec029", "sec018"];
 
   const results = await Promise.all(
@@ -93,7 +93,7 @@ function toListItem(type: ReportType, row: Record<string, unknown>): ReportListI
 }
 
 export async function getReportById(type: ReportType, id: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const table = REPORT_META[type].table;
   const { data } = await supabase.from(table).select("*").eq("id", id).single();
   if (!data) return null;

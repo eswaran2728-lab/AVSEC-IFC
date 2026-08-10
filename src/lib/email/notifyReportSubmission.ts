@@ -22,7 +22,7 @@ export async function notifyReportSubmission({
   fields: EmailField[];
 }): Promise<void> {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: adminEmails, error } = await supabase.rpc("get_admin_emails");
 
     if (error || !adminEmails || adminEmails.length === 0) {
