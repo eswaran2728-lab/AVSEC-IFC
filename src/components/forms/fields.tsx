@@ -115,7 +115,7 @@ export function TextAreaField<T extends FieldValues>({
     <div className={className}>
       <label className="field-label" htmlFor={name}>
         {label}
-        {required && <span className="text-red-500"> *</span>}
+        {required && <span style={{ color: "var(--red)" }}> *</span>}
       </label>
       <textarea id={name} rows={rows} className="input-base" {...register(name)} />
       {hint && <p className="field-hint">{hint}</p>}
@@ -139,7 +139,7 @@ export function SelectField<T extends FieldValues>({
     <div className={className}>
       <label className="field-label" htmlFor={name}>
         {label}
-        {required && <span className="text-red-500"> *</span>}
+        {required && <span style={{ color: "var(--red)" }}> *</span>}
       </label>
       <select id={name} className="input-base" defaultValue="" {...register(name)}>
         <option value="" disabled>
