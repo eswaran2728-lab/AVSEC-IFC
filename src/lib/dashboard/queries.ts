@@ -32,6 +32,7 @@ export interface FilteredSubmission {
   submitted_at: string | null;
   profile_id: string;
   summary: string;
+  report_no: string | null;
 }
 
 export async function getFilteredSubmissions(filters: DashboardFilters): Promise<FilteredSubmission[]> {
@@ -90,6 +91,7 @@ function summarize(type: ReportType, row: Record<string, unknown>): FilteredSubm
     submitted_at: (row.submitted_at as string | null) ?? null,
     profile_id: String(row.profile_id),
     summary,
+    report_no: (row.report_no as string | null) ?? null,
   };
 }
 
